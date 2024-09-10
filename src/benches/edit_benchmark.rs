@@ -5,7 +5,7 @@ use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criteri
 use lib::{alignment_lib::Penalties, wavefront_alignment::wavefront_align};
 use libwfa::{bindings::BUFFER_SIZE_8M, mm_allocator::MMAllocator, penalties::AffinePenalties};
 
-use sequence_distance_benchmark::test_data::test::Data;
+use sequence_distance_benchmark::{edit::local::hamming_fast, test_data::test::Data};
 use rust_hamming_distance::hamming_distance::HammingDistancable;
 use triple_accel::hamming;
 
@@ -195,16 +195,10 @@ pub fn compare_noerror(c: &mut Criterion) {
                 assert_eq!(truth[i], dist);
             });
         }));
-        group.bench_with_input(BenchmarkId::new("length_assert_naive_hamming", id), &data, |b, data| b.iter(|| {
+        group.bench_with_input(BenchmarkId::new("ultra-fast", id), &data, |b, data| b.iter(|| {
             data.zip_seq().enumerate().for_each(|(i, (query,reference))| { 
                 let len = min(query.len(), reference.len());
-                let dist = black_box(
-                    match len {
-                        l if l <= 32 => sequence_distance_benchmark::edit::local::hamming_32(&query[0..len], &reference[0..len]),
-                        l if l <= 64 => sequence_distance_benchmark::edit::local::hamming_64(&query[0..len], &reference[0..len]),
-                        l if l <= 128 => sequence_distance_benchmark::edit::local::hamming_128(&query[0..len], &reference[0..len]),
-                        _ => sequence_distance_benchmark::edit::local::hamming(&query[0..len], &reference[0..len]),
-                    });
+                let dist = black_box(hamming_fast(&query[..len], &reference[..len]));
                 assert_eq!(truth[i], dist);
             });
         }));
