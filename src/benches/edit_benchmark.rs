@@ -213,4 +213,4 @@ pub fn compare_noerror(c: &mut Criterion) {
 }
 
 criterion_group!(benches, compare_noerror);
-criterion_main!(benches);_
+criterion_main!(benches);
