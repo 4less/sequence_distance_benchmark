@@ -4,6 +4,21 @@
 pub mod local {
     use std::iter::zip;
 
+    pub fn hamming_32(s1: &[u8], s2: &[u8]) -> i32 {
+        assert!(s1.len() <= 32);
+        zip(s1, s2).fold(0, |acc, (a,b)| acc + (a != b) as i32)
+    }
+
+    pub fn hamming_64(s1: &[u8], s2: &[u8]) -> i32 {
+        assert!(s1.len() <= 64);
+        zip(s1, s2).fold(0, |acc, (a,b)| acc + (a != b) as i32)
+    }
+
+    pub fn hamming_128(s1: &[u8], s2: &[u8]) -> i32 {
+        assert!(s1.len() <= 128);
+        zip(s1, s2).fold(0, |acc, (a,b)| acc + (a != b) as i32)
+    }
+
     pub fn hamming(s1: &[u8], s2: &[u8]) -> i32 {
         zip(s1, s2).fold(0, |acc, (a,b)| acc + (a != b) as i32)
     }
