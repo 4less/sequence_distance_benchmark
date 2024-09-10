@@ -168,7 +168,8 @@ pub fn compare_noerror(c: &mut Criterion) {
                     if len <= 100 {
                         black_box(sequence_distance_benchmark::edit::local::hamming(&query[0..len], &reference[0..len]))
                     } else {
-                        black_box(hamming(&query[0..len], &reference[0..len]) as i32)
+                        black_box(sequence_distance_benchmark::edit::local::hamming(&query[0..len], &reference[0..len]))
+                        // black_box(hamming(&query[0..len], &reference[0..len]) as i32)
                 });
                 assert_eq!(truth[i], dist);
             });
@@ -194,13 +195,13 @@ pub fn compare_noerror(c: &mut Criterion) {
                 assert_eq!(truth[i], dist);
             });
         }));
-        group.bench_with_input(BenchmarkId::new("wild!_naive_triple_accel", id), &data, |b, data| b.iter(|| {
+        group.bench_with_input(BenchmarkId::new("length_assert_naive_hamming", id), &data, |b, data| b.iter(|| {
             data.zip_seq().enumerate().for_each(|(i, (query,reference))| { 
                 let len = min(query.len(), reference.len());
                 let dist = black_box(
                     match len {
-                        l if l <= 128 => sequence_distance_benchmark::edit::local::hamming_128(&query[0..len], &reference[0..len]),
-                        l if l <= 128 => sequence_distance_benchmark::edit::local::hamming_128(&query[0..len], &reference[0..len]),
+                        l if l <= 32 => sequence_distance_benchmark::edit::local::hamming_32(&query[0..len], &reference[0..len]),
+                        l if l <= 64 => sequence_distance_benchmark::edit::local::hamming_64(&query[0..len], &reference[0..len]),
                         l if l <= 128 => sequence_distance_benchmark::edit::local::hamming_128(&query[0..len], &reference[0..len]),
                         _ => sequence_distance_benchmark::edit::local::hamming(&query[0..len], &reference[0..len]),
                     });
