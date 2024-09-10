@@ -152,6 +152,15 @@ pub fn compare_noerror(c: &mut Criterion) {
     // }
     // group.finish();
 
+    fn local_hamming(query: &[u8], reference: &[u8]) -> i32 {
+        let len = min(query.len(), reference.len());
+        if len <= 100 {
+            black_box(sequence_distance_benchmark::edit::local::hamming(&query[0..len], &reference[0..len]))
+        } else {
+            black_box(sequence_distance_benchmark::edit::local::hamming(&query[0..len], &reference[0..len]))
+            // black_box(hamming(&query[0..len], &reference[0..len]) as i32)
+        }
+    }
 
 
     let mut group: criterion::BenchmarkGroup<'_, criterion::measurement::WallTime> = c.benchmark_group("hamming");
@@ -171,6 +180,13 @@ pub fn compare_noerror(c: &mut Criterion) {
                         black_box(sequence_distance_benchmark::edit::local::hamming(&query[0..len], &reference[0..len]))
                         // black_box(hamming(&query[0..len], &reference[0..len]) as i32)
                 });
+                assert_eq!(truth[i], dist);
+            });
+        }));
+        group.bench_with_input(BenchmarkId::new("hybrid_naive_triple_accel_external", id), &data, |b, data| b.iter(|| {
+            data.zip_seq().enumerate().for_each(|(i, (query,reference))| { 
+                let len = min(query.len(), reference.len());
+                let dist = black_box(local_hamming(&query[0..len], &reference[0..len]));
                 assert_eq!(truth[i], dist);
             });
         }));
